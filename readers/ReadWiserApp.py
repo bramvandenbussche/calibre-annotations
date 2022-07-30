@@ -64,26 +64,42 @@ class ReadWiserApp(ExportingReader):
             </style>
             </head>
             <body>
-                <h3>Exporting annotations from SampleExportingApp</h3>
+                <h3>Exporting annotations from Moon Reader Pro</h3>
                 <div class="steps_with_header_indent">
                   <p><i>From within an open book:</i></p>
                   <ol>
-                    <li>Tap the center of the screen so that the overlay controls are shown</li>
-                    <li>Tap <b>Bookmarks</b> (page marker icon at bottom center)</li>
-                    <li>Tap <b>Bookmarks</b> (top right)</li>
-                    <li>Tap <b>Share</b> (arrow icon at top right)</li>
-                    <li>Tap <b>Email</b>, then email the annotations file to yourself</li>
+                    <li>Open your bookmarks</li>
+                    <li>Tap the <b>three dots</b> icon at the start of the bookmark</li>
+                    <li>Tap the <b>Share -> Readwise</b> option in the menu that appears</li>
                   </ol>
                 </div>
                 <hr width="80%" />
-                <h3>Importing SampleExportingApp annotations to calibre</h3>
+                <h3>Setting up ReadWiser</h3>
                 <div class="steps_with_header_indent">
-                  <p><i>After receiving the emailed annotations summary on your computer:</i></p>
+                  <p><i>You'll need Moon Reader Pro for this, we're gonna hijack the Readwise integration by pointing Moon Reader Pro to the ReadWiser API instead</i></p>
+                  <h4>Moon Reader Setup</h4>
                   <ol>
-                    <li>Copy the contents of the annotations summary email</li>
-                    <li>Paste the annotations to the <b>Import SampleExportingApp annotations</b> window</li>
-                    <li>Click <b>Import</b></li>
+                    <li>Open your bookmarks</li>
+                    <li>Tap the <b>Settings</b> icon in the bottom right</li>
+                    <li>Tap the <b>Settings</b> icon next to <i>Share new highlights and notes to Readwise automatically</i></li>
+                    <li>Add your <b>Token</b> in the <b>Token</b> field</li>
+                    <li>Change the Readwise <b>Url</b> to <i>https://readwiser-api.azurewebsites.net</i></li>
+                    <li>Tap <b>OK</b></li>
                   </ol>
+                  <h4>Calibre Setup</h4>
+                  <ol>
+                    <li>Navigator to your Calibre installation folder</li>
+                    <li>Open the <b>Calibre Settings\plugins</b> folder</li>
+                    <li>Open <b>annotations.json</b> with your favorite text editor</li>
+                    <li>
+                        Add the following line:
+                        <blockquote css="font-family: consollas, serif;">
+                            "readwiser_api_key": "ADD_YOUR_TOKEN_HERE"
+                        </blockquote>
+                    </li>
+                    <li>Save the file, and restart Calibre</li>
+                  </ol>
+
                 </div>
             </body>
             </html>''')
