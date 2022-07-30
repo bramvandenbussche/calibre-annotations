@@ -88,17 +88,23 @@ class ReadWiserApp(ExportingReader):
             </body>
             </html>''')
     
-    debug = True
-    api_base_url_local = "https://localhost:7113" # TODO: Get this from plugin config?
-    api_base_url_prod = "https://readwiser-api.azurewebsites.net" # TODO: Get this from plugin config?
-    api_key = "hYN2J49m5yb37fvn6V7EL7C9D8piVEgTaKhThWdqt7CLHg9L" # TODO: Get this from plugin config?
+    debug = False
+    api_base_url = "https://readwiser-api.azurewebsites.net"
+    api_key = "INVALID_KEY"
     
     # Change this to True when developing a new class from this template
     SUPPORTS_EXPORTING = True
 
     def parse_exported_highlights(self, raw, log_failure=True):
-        
         self._log("{:~^80}".format(" Starting ReadWiser Import "))
+        
+        # Load settings
+        self.debug = self.opts.prefs.get('readwiser_debug', False)
+        self.api_base_url = self.opts.prefs.get('readwiser_api_base_url', self.api_base_url)
+        self.api_key = self.opts.prefs.get('readwiser_api_key', self.api_key)
+
+        if self.debug:
+            self._log("Loaded settings:\nAPI URL: {0}\nAPI KEY: {1}".format(self.api_base_url, self.api_key))
         
         # Create the annotations, books table as needed
         self.annotations_db = "%s_imported_annotations" % self.app_name_
@@ -127,12 +133,8 @@ class ReadWiserApp(ExportingReader):
             # Populate a BookStruct
             book_struct = BookStruct()
 
-            if raw != "all":
-                book_struct.book_id = mi.id            
-                book_struct.cid = mi.id
-            else:
-                book_struct.book_id = book['id']
-                book_struct.cid = book['id']
+            book_struct.book_id = book['id']
+            book_struct.cid = book['id']
 
             book_struct.active = True
             book_struct.author = book['author']
@@ -200,35 +202,28 @@ class ReadWiserApp(ExportingReader):
 
     
     def call_api_for_one_book(self, author, title):
-        self._log("Calling ReaderWiser API for [{0} - {1}]".format(author, title))
-        
         if self.debug:
-            url = self.api_base_url_local
-        else:
-            url = self.api_base_url_prod
-
-        url = "{0}/api/highlight/book?title={1}&author={2}".format(url, urllib.parse.quote(title), urllib.parse.quote(author))
+            self._log("Calling ReaderWiser API for [{0} - {1}]".format(author, title))
+        
+        url = "{0}/api/highlight/book?title={1}&author={2}".format(self.api_base_url, urllib.parse.quote(title), urllib.parse.quote(author))
         
         return self.call_api(url)
 
 
 
     def call_api_for_all(self):
-        self._log("Calling ReaderWiser API for all highlights")
-        
         if self.debug:
-            url = self.api_base_url_local
-        else:
-            url = self.api_base_url_prod
-
-        url = "{0}/api/highlight".format(url)
+            self._log("Calling ReaderWiser API for all highlights")
+        
+        url = "{0}/api/highlight".format(self.api_base_url)
 
         return self.call_api(url)
 
 
 
     def call_api(self, url):
-        self._log("URL: {0}".format(url))
+        if self.debug:
+            self._log("URL: {0}".format(url))
 
         req = Request(url)
         req.add_header('Authorization', 'Token {0}'.format(self.api_key))
@@ -243,12 +238,14 @@ class ReadWiserApp(ExportingReader):
         else:
             response = urlopen(req)
 
-        self._log(response.status)
+        if self.debug:
+            self._log("Server response: {0}".format(response.status))
 
         body = response.read().decode(response.headers.get_content_charset())
-        self._log("{:~^80}".format(" Response Body "))
-        self._log(body)
-        self._log("{:~^80}".format(" End of Response Body "))
+        if self.debug:
+            self._log("{:~^80}".format(" Response Body "))
+            self._log(body)
+            self._log("{:~^80}".format(" End of Response Body "))
 
         data = json.loads(body)
 
