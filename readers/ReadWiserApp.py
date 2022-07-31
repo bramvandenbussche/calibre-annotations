@@ -145,7 +145,7 @@ class ReadWiserApp(ExportingReader):
             selected_book = db.get_metadata(book_id, index_is_id=True) # Get book user has selected
 
         # Call API for one book        
-        if selected_book == None:
+        if selected_book == None or raw == 'all':
             data = self.call_api_for_all()
         else:
             data = self.call_api_for_one_book(selected_book.authors[0], selected_book.title)
