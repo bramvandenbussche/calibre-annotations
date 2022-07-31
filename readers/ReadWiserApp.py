@@ -112,6 +112,7 @@ class ReadWiserApp(ExportingReader):
     # Change this to True when developing a new class from this template
     SUPPORTS_EXPORTING = True
     REQUIRES_TEST_INPUT = False
+    REQUIRES_BOOK_SELECTED = False
 
     def parse_exported_highlights(self, raw, log_failure=True):
         self._log("{:~^80}".format(" Starting ReadWiser Import "))
@@ -134,27 +135,30 @@ class ReadWiserApp(ExportingReader):
         self.selected_books = None
 
         # Generate the book metadata from the selected book
-        row = self.opts.gui.library_view.currentIndex() # User selected row
-        book_id = self.opts.gui.library_view.model().id(row)
-        db = self.opts.gui.current_db
-        mi = db.get_metadata(book_id, index_is_id=True) # Get book user has selected
+        rows = self.opts.gui.library_view.selectionModel().selectedRows()
 
-        # Populate author, title at a minimum
+        if len(rows) == 0 or len(rows) > 1:
+            selected_book = None
+        else:
+            book_id = self.opts.gui.library_view.model().id(rows[0])
+            db = self.opts.gui.current_db
+            selected_book = db.get_metadata(book_id, index_is_id=True) # Get book user has selected
 
-        # Call API for one book
-        if raw == "all":
+        # Call API for one book        
+        if selected_book == None:
             data = self.call_api_for_all()
         else:
-            data = self.call_api_for_one_book(mi.authors[0], mi.title)
+            data = self.call_api_for_one_book(selected_book.authors[0], selected_book.title)
 
         if len(data['books']) == 0:
             MessageBox(MessageBox.INFO,
                    'No annotations found',
-                   msg='The server didn''t find any annotations for the selected book',
+                   msg='The server didn''t find any annotations for [{0} - {1}]'.format(selected_book.authors[0], selected_book.title),
                    show_copy_button=False).exec_()
 
         for book in data['books']:
             # Populate a BookStruct
+            # Populate author, title at a minimum
             book_struct = BookStruct()
 
             book_struct.book_id = book['id']
