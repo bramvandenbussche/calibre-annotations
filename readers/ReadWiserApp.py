@@ -105,11 +105,12 @@ class ReadWiserApp(ExportingReader):
             </html>''')
     
     debug = False
-    api_base_url = "https://readwiser-api.azurewebsites.net"
+    api_base_url = "INVALID_URL"
     api_key = "INVALID_KEY"
     
     # Change this to True when developing a new class from this template
     SUPPORTS_EXPORTING = True
+    REQUIRES_TEST_INPUT = False
 
     def parse_exported_highlights(self, raw, log_failure=True):
         self._log("{:~^80}".format(" Starting ReadWiser Import "))
