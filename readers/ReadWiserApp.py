@@ -17,7 +17,7 @@ import json
 
 from calibre_plugins.annotations.common_utils import (AnnotationStruct, BookStruct)
 from calibre_plugins.annotations.reader_app_support import ExportingReader
-
+from calibre.gui2.dialogs.message_box import MessageBox
 
 
 class ReadWiserApp(ExportingReader):
@@ -144,6 +144,12 @@ class ReadWiserApp(ExportingReader):
             data = self.call_api_for_all()
         else:
             data = self.call_api_for_one_book(mi.authors[0], mi.title)
+
+        if len(data['books']) == 0:
+            MessageBox(MessageBox.INFO,
+                   'No annotations found',
+                   msg='The server didn''t find any annotations for the selected book',
+                   show_copy_button=False).exec_()
 
         for book in data['books']:
             # Populate a BookStruct
