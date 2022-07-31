@@ -94,6 +94,7 @@ class ReadWiserApp(ExportingReader):
                     <li>
                         Add the following line:
                         <blockquote css="font-family: consollas, serif;">
+                            "readwiser_api_base_url": "ADD_BASE_URL_HERE",
                             "readwiser_api_key": "ADD_YOUR_TOKEN_HERE"
                         </blockquote>
                     </li>
